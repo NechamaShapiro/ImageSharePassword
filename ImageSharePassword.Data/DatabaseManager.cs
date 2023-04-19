@@ -10,7 +10,7 @@ namespace ImageSharePassword.Data
         {
             using var connection = new SqlConnection(_connectionString);
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = "INSERT INTO Images VALUES (@imageName, @imagePath, @password, 0) SELECT SCOPE_IDENTITY()";
+            cmd.CommandText = "INSERT INTO Images VALUES (@imageName, @imagePath, @password, 1) SELECT SCOPE_IDENTITY()";
             cmd.Parameters.AddWithValue("@imageName", imageName);
             cmd.Parameters.AddWithValue("@imagePath", imagePath);
             cmd.Parameters.AddWithValue("@password", password);
@@ -36,20 +36,14 @@ namespace ImageSharePassword.Data
             }
             return img;
         }
-        //public string GetPasswordById(int id)
-        //{
-        //    using var conn = new SqlConnection(_connectionString);
-        //    using var cmd = conn.CreateCommand();
-        //    cmd.CommandText = "SELECT Password FROM  Images WHERE Id = @id";
-        //    cmd.Parameters.AddWithValue("@id", id);
-        //    conn.Open();
-        //    var reader = cmd.ExecuteReader();
-        //    var password = "";
-        //    while (reader.Read())
-        //    {
-        //        password = (string)reader["Password"];
-        //    }
-        //    return password;
-        //}
+        public void IncrementViewsById(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE Images SET Views = Views + 1 WHERE Id = @id";
+            cmd.Parameters.AddWithValue("@id", id);
+            connection.Open();
+            cmd.ExecuteNonQuery();
+        }
     }
 }

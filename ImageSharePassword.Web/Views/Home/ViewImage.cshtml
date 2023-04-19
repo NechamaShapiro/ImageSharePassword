@@ -1,23 +1,29 @@
-﻿@using ImageSharePassword.Data
-@model Image
+﻿@model ImageViewModel
 <div class="row">
-    @if (HttpContext.Session.Get($"{Model.Id}"))
+    @if (Model.ShowImage)
     {
-        @*shows image*@
         <div class="col-md-8 offset-md-2">
-            <img src="\uploads\@Model.ImageName" style="width: 800px;" />
+            <img src="\uploads\@Model.Image.ImageName" style="width: 800px;" />
             <br />
-            <h3>@Model.Views</h3>
+            <h3>Views: @Model.Image.Views</h3>
         </div>
     }
     else
     {
-        @*enter password*@
+        if (!String.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="col-md-12">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @ViewBag.Message
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
         @*ALERT WHEN INCORRECT PASSWORD IS ENTERED: <h3 class="alert-danger">Invalid password</h3>*@
         <div class="col-md-6 offset-md-3 bg-light p-4 rounded shadow">
             <h4>Please enter the password for this image:</h4>
             <form method="post">
-                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="id" value="@Model.Image.Id" />
                 <input type="password" class="form-control" placeholder="Password" name="password" />
                 <br />
                 <button class="btn btn-primary w-100">Submit</button>

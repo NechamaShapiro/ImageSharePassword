@@ -2,6 +2,7 @@
 using ImageSharePassword.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text.Json;
 
 namespace ImageSharePassword.Web.Controllers
@@ -37,18 +38,41 @@ namespace ImageSharePassword.Web.Controllers
         public IActionResult ViewImage(int id)
         {
             var mgr = new DatabaseManager();
-            return View(mgr.GetImageById(id));
+            var vm = new ImageViewModel();
+            vm.Image = mgr.GetImageById(id);
+            vm.ShowImage = false;
+            return View(vm);
         }
         [HttpPost]
         public IActionResult ViewImage(int id, string password)
         {
             var mgr = new DatabaseManager();
-            var img = mgr.GetImageById(id);
-            if(password == img.Password)
+            var vm = new ImageViewModel();
+            vm.Image = mgr.GetImageById(id);
+            List<int> ids = HttpContext.Session.Get<List<int>>("ids");
+            if (ids == null)
             {
-                HttpContext.Session.Set($"{id}", true);
+                ids = new List<int>();
             }
-            return View(img);
+            if (password == vm.Image.Password)
+            {
+                ids.Add(id);
+                vm.ShowImage = true;
+                mgr.IncrementViewsById(id);
+            }
+            else
+            {
+                TempData["invalid-password-message"] = "Invalid password. Please try again.";
+                vm.ShowImage = false;
+            }
+            
+            HttpContext.Session.Set("ids", ids);
+
+            if (TempData["invalid-password-message"] != null)
+            {
+                ViewBag.Message = (string)TempData["invalid-password-message"];
+            }
+            return View(vm);
         }
     }
     public static class SessionExtensions
