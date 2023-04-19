@@ -19,8 +19,6 @@ namespace ImageSharePassword.Web.Controllers
         public IActionResult Index()
         {
             return View();
-            //var mgr = new DatabaseManager();
-            //return View(mgr.GetAll());
         }
         [HttpPost]
         public IActionResult Upload(IFormFile image, string password)
